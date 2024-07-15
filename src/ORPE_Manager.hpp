@@ -34,35 +34,7 @@ namespace ORPETMW {
 extern Topic<bool> enableORPE; //Publish to this to enable for disable ORPE.
 extern Topic<ORPEState_t> orpeState; //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
 extern Topic<HTransform_F> orpeRelativePose; //This is where pose estimations will be published once valid.
-//extern Topic<bool> orpeControlTargetCamera; //Set if we sould start communicating with the target satellite (Other satellite) ORPE system.
 
-
-//Class to setup, communicate and control ORPE via datalink.
-/*class ORPEManager : StaticThread<> {
-private:
-
-
-
-public:
-
-
-    void init() override {
-
-        datalinkGateway.addTopicsToForward(&orpeTelemetryTop, &orpeTelecommandsTop);
-
-    }
-
-
-    void run() override {
-
-        suspendCallerUntil(END_OF_TIME);
-
-    }
-
-}
-
-//Instance of the ORPE manager to control ORPE and receive telemetry.
-extern ORPEManager orpeManager;*/
 
 }
 

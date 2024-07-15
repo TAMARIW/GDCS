@@ -32,7 +32,6 @@ Topic<ORPEState_t> orpeTgtSttTopic(DATALINK_ORPESTATE_SELF_TOPICID, "ORPE TGT st
 Topic<bool> enableORPE(ORPE_ENABLE, "ORPE Enable manager"); //Publish to this to enable for disable ORPE.
 Topic<ORPEState_t> orpeState(ORPE_STATE, "ORPE State manager"); //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
 Topic<HTransform_F> orpeRelativePose(ORPE_RELATIVEPOSE, "ORPE relative pose estimations manager"); //This is where pose estimations will be published once valid.
-//Topic<bool> orpeControlTargetCamera; //Set if we sould start communicating with the target satellite (Other satellite) ORPE system.
 
 
 //ORPE buffers and subscribers
