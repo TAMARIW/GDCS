@@ -3,6 +3,8 @@
 
 #include "rodos.h"
 
+#include "Datastruct.h"
+
 #include "hamming/HammingCodes.h"
 
 /**
@@ -26,9 +28,9 @@
 #define LEDPIN_3 GPIO_049
 #define LEDPIN_4 GPIO_019
 #define LEDPIN_5 GPIO_051
-#define LEDPIN_6 GPIO_053
+#define LEDPIN_6 GPIO_015
 
-#define LEDPIN_7 GPIO_054
+#define LEDPIN_7 GPIO_014
 #define LEDPIN_8 GPIO_055
 #define LEDPIN_9 GPIO_059
 #define LEDPIN_10 GPIO_077

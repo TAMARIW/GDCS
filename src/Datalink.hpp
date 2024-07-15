@@ -4,8 +4,13 @@
 #include "rodos.h"
 
 
-//Topics used by ORPE.
-Topic 
+/**
+ * Setup for everything needed for the datalink between this and target stm32 and rpi zero 2. (HAL, Link, Gateway)
+ */
 
+//Gateway setup
+extern HAL_UART datalinkUART;
+extern LinkinterfaceUART uartLinkinterface;
+extern Gateway datalinkGateway;
 
 #endif

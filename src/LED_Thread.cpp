@@ -1,4 +1,8 @@
 #include "rodos.h"
+#include "Datastruct.h"
+
+#include "Datalink.hpp"
+
 #include "LED_Thread.hpp"
 
 using namespace ORPE;
@@ -205,13 +209,30 @@ void ORPE_LEDControl::ledCodingStateMachine(size_t ledIndex, bool beginCoding, b
 
 void ORPE_LEDControl::runtimeIDLogic() {
 
-    
+    /*OrpeTelemetry orpeTele;
+    if (teleBuf_.getOnlyIfNewData(orpeTele) && orpeTele.valid) {
+
+        lastORPETeleRecvTime_ = NOW();
+
+        if (ledMode_[0] != LEDCodingMode_t::LEDCodingMode_Illuminate) {
+            for (int i = 0; i < 12; i++) 
+                setLEDMode(LEDCodingMode_t::LEDCodingMode_Illuminate, i);
+        }
+
+    }
+
+    if (NOW() - lastORPETeleRecvTime_ > 1*SECONDS && ledMode_[0] != LEDCodingMode_t::LEDCodingMode_Continuous) {
+        for (int i = 0; i < 12; i++) 
+            setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, i);
+    }*/
 
 }
 
 
 void ORPE_LEDControl::init() {
+
     setupAllLEDs();
+
 }
 
 

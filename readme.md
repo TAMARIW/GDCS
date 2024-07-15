@@ -1,9 +1,9 @@
-#Build tutorial:
+# Build tutorial:
 
 ```
 mkdir build
 cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=../rodos/cmake/port/discovery.cmake ..
+cmake -DCMAKE_TOOLCHAIN_FILE=../lib/rodos/cmake/port/discovery.cmake ..
 make -j                
 arm-none-eabi-objcopy -O binary tmwstm32 upload.bin    #upload.bin is the the actual program.
 ```
