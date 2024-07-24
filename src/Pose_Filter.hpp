@@ -34,6 +34,9 @@ private:
 
     Vector3D_F uwbPositionCov_ = Vector3D_F(10, 10, 10);  //The covariance of uwb radio based position estimations. Usually higher than orpe position estimation.
 
+    float attitudeNoiseCov_ = 1;   //The noise of the process for attitude. Same in all axis'.
+    float positionNoiseCov_ = 1;   //The noise fo the process for the position. Same in all axis'.
+
 
     SubscriberObjRecv<HTransform_F, PoseFilter> orpePoseRecv_;
     SubscriberObjRecv<Vector3D_F, PoseFilter> uwbPosRecv_;
