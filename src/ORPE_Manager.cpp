@@ -117,14 +117,41 @@ public:
 
     void run() override {
 
-        int64_t lastOrpePose = 0;
-        bool waiting = true;
+        ORPECommand cmd;
+        cmd.command = ORPECommandType_t::ORPECommandType_Startup;
+        orpeSelfCmdTopic.publish(cmd);
 
-        enableORPE.publish(false);
+        ORPEState_t state;
+        HTransform_F pose;
+
+        int64_t lastORPEInfo = NOW();
 
         while (1) { 
             
-            enableORPE.publish(true);
+            if (orpeStateBuf_.getOnlyIfNewData(state)) {
+
+                lastORPEInfo = NOW();
+                
+                if (state != ORPEState_t::ORPEState_Running) {
+                    enableORPE.publish(true);
+                }
+
+            }
+
+            if (orpePoseBuf_.getOnlyIfNewData(pose)) {
+
+                lastORPEInfo = NOW();
+
+            }
+                
+
+            if (NOW() - lastORPEInfo > 2*SECONDS) { //attempt to startup ORPE if we cant see any state updates
+                lastORPEInfo = NOW();
+
+                cmd.command = ORPECommandType_t::ORPECommandType_Startup;
+                orpeSelfCmdTopic.publish(cmd);      
+
+            }
 
             suspendCallerUntil(NOW() + 1000*MILLISECONDS);
 
