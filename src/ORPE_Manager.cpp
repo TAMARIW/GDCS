@@ -32,6 +32,7 @@ Topic<ORPEState_t> orpeTgtSttTopic(DATALINK_ORPESTATE_SELF_TOPICID, "ORPE TGT st
 Topic<bool> enableORPE(ORPE_ENABLE, "ORPE Enable manager"); //Publish to this to enable for disable ORPE.
 Topic<ORPEState_t> orpeState(ORPE_STATE, "ORPE State manager"); //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
 Topic<HTransform_F> orpeRelativePose(ORPE_RELATIVEPOSE, "ORPE relative pose estimations manager"); //This is where pose estimations will be published once valid.
+Topic<OrpeTelemetry> orpeTelemetry(ORPE_TELEMETRY, "ORPE telemetry.");
 
 
 //ORPE buffers and subscribers
@@ -59,6 +60,8 @@ void callbackFuncSelfORPEState(ORPEState_t& state) {
 SubscriberReceiver<ORPEState_t> selfORPEStateRecv(orpeSelfSttTopic, callbackFuncSelfORPEState);
 
 void callbackFuncSelfORPETelemetry(OrpeTelemetry& telemetry) {
+
+    orpeTelemetry.publish(telemetry); //Forward for the rest of the system
 
     if (telemetry.valid) {
 
@@ -121,22 +124,9 @@ public:
 
         while (1) { 
             
-            ORPEState_t orpeState;
-            if (orpeStateBuf_.getOnlyIfNewData(orpeState) && orpeState != ORPEState_t::ORPEState_Running) {
-                enableORPE.publish(true);
-                waiting = true;
-            }
+            enableORPE.publish(true);
 
-            HTransform_F pose;
-            if (orpePoseBuf_.getOnlyIfNewData(pose)) {
-
-                enableORPE.publish(false);
-                
-            }
-
-            //PRINTF("TEST\n");
-
-            suspendCallerUntil(NOW() + 2000*MILLISECONDS);
+            suspendCallerUntil(NOW() + 1000*MILLISECONDS);
 
         }
 

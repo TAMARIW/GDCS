@@ -24,6 +24,7 @@
 #define ORPE_ENABLE         1200 //ORPE enable commands from manager
 #define ORPE_STATE          1201 //ORPE state publishes from manager
 #define ORPE_RELATIVEPOSE   1202 //ORPE relative pose estimations from manager
+#define ORPE_TELEMETRY      1203 //ORPE telemetry direct from ORPE
 
 
 // Namespace for encapsulation
@@ -34,7 +35,7 @@ namespace ORPETMW {
 extern Topic<bool> enableORPE; //Publish to this to enable for disable ORPE.
 extern Topic<ORPEState_t> orpeState; //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
 extern Topic<HTransform_F> orpeRelativePose; //This is where pose estimations will be published once valid.
-
+extern Topic<OrpeTelemetry> orpeTelemetry; //This is where the raw direct telemetry packets are published from ORPE. They contain advanced info on ORPE.
 
 }
 
