@@ -49,6 +49,9 @@ HAL_GPIO led(GPIO_078);
 // Contain the sensors measured values.
 CommBuffer<float> com_dist0, com_dist1, com_dist2, com_dist3;
 
+// Topic to publish the UWB position estimations.
+Topic<Vector3D_F> uwbPositionTopic(-1, "UWB Position estimations"); 
+
 
 void DecaWaveDistanceMeasurement::init() {
     ledb.init(1, 1, 0);
@@ -282,7 +285,7 @@ void DecaWaveDistanceMeasurement::receiveMessages() {
     }
 }
 
-class EstimatedPositionCalculator : StaticThread<>, IOEventReceiver {
+class EstimatedPositionCalculator : StaticThread<3000>, IOEventReceiver {
     Vector3D posInSat0 = Vector3D(0.0, 0.0, 0.0);
     Vector3D posInSat1 = Vector3D(0.3, 0.0, 0.0);
 
@@ -401,6 +404,10 @@ public:
 
                 // Calculate rotation based on previous and estimated position.
                 data.sat1Rotation = calculateRotation(uwbPosition1_0, uwbPosition1_1, x0, x1);
+
+                // Satellite position is the middle of the two sensors.
+                Vector3D_F satPos = Vector3D_F((x0[0] + x1[0]) / 2, (x0[1] + x1[1]) / 2, (x0[2] + x1[2]) / 2);
+                uwbPositionTopic.publish(satPos);
 
                 // Update estimated position.
                 uwbPosition1_0 = x0;
