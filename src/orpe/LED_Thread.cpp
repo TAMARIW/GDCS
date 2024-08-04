@@ -1,7 +1,7 @@
 #include "rodos.h"
 #include "Datastruct.h"
 
-#include "Datalink.hpp"
+#include "../Datalink.hpp"
 
 #include "LED_Thread.hpp"
 

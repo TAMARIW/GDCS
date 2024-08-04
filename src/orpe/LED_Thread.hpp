@@ -5,7 +5,7 @@
 
 #include "Datastruct.h"
 
-#include "hamming/HammingCodes.h"
+#include "../hamming/HammingCodes.h"
 
 /**
  * Pins of the LEDs
