@@ -1,6 +1,7 @@
 #include "rodos.h"
 
 #include "../orpe/ORPE_Manager.hpp"
+#include "../radio_pose/decaWaveTopics.hpp"
 
 #include "Pose_Filter.hpp"
 
@@ -15,11 +16,8 @@ Topic<Quaternion_F> filterAttitudeTopic(-1, "Pose Filter Output Attitude");
 Topic<Vector3D_F> filterPositionTopic(-1, "Pose Filter Output Position");
 
 
-Topic<Vector3D_F> uwbDummyTopic(-1, "UWB dummy topic so it compiles");
-
-
 /// @brief Global filter object for use by other systems
-extern PoseFilter globalEstimationFilter(ORPETMW::orpeRelativePose, uwbDummyTopic);
+extern PoseFilter globalEstimationFilter(ORPETMW::orpeRelativePose, uwbPositionTopic);
 
 
 
