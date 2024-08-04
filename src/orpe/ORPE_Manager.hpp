@@ -7,7 +7,7 @@
 
 #include "Datastruct.h"
 
-#include "Datalink.hpp"
+#include "../Datalink.hpp"
 
 
 //Settings for the ORPE datalink.
