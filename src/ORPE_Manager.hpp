@@ -11,7 +11,7 @@
 
 
 //Settings for the ORPE datalink.
-#define SWITCH_ORPE_COMMS //Uncomment to switch the SELF and TGT ORPE for communication
+//#define SWITCH_ORPE_COMMS //Uncomment to switch the SELF and TGT ORPE for communication
 
 #define DATALINK_ORPETELEMETRY_SELF_TOPICID     1300 //ORPE pose estimations from the same satellite. (From itsself)
 #define DATALINK_ORPETELECOMMAND_SELF_TOPICID   1301 //ORPE telecommands to ORPE on same satellite. (To itsself)
