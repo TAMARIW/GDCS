@@ -8,7 +8,7 @@
 //Gateway setup
 HAL_UART datalinkUART(UART_IDX::UART_IDX3, GPIO_026, GPIO_027);
 LinkinterfaceUART uartLinkinterface(&datalinkUART, 115200);
-Gateway datalinkGateway(&uartLinkinterface, true);
+Gateway datalinkGateway(&uartLinkinterface);
 
 
 //Class to setup and control the datalink stuff
