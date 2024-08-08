@@ -23,19 +23,20 @@
  *      10
  *
  */
-#define LEDPIN_1 GPIO_048
-#define LEDPIN_2 GPIO_049
-#define LEDPIN_3 GPIO_050
-#define LEDPIN_4 GPIO_051
-#define LEDPIN_5 GPIO_052
-#define LEDPIN_6 GPIO_053
+
+#define LEDPIN_1 GPIO_053
+#define LEDPIN_2 GPIO_052
+#define LEDPIN_3 GPIO_051
+#define LEDPIN_4 GPIO_050
+#define LEDPIN_5 GPIO_048
+#define LEDPIN_6 GPIO_049
 
 #define LEDPIN_7 GPIO_054
-#define LEDPIN_8 GPIO_055
-#define LEDPIN_9 GPIO_067
+#define LEDPIN_8 GPIO_069
+#define LEDPIN_9 GPIO_070
 #define LEDPIN_10 GPIO_068
-#define LEDPIN_11 GPIO_069
-#define LEDPIN_12 GPIO_070
+#define LEDPIN_11 GPIO_055
+#define LEDPIN_12 GPIO_067
 
 
 /**
