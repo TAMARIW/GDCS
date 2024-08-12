@@ -43,7 +43,7 @@ Gateway datalinkGateway(&uartLinkinterface);
 class DatalinkManagment : StaticThread<> {
 private:
 
-    int64_t lastHeartbeatSend_ = 0;
+    int64_t nextHeartbeatSend_ = 0;
     int64_t lastHeartbeatRecv_ = 0;
     int64_t wifiConnectionWaitEnd_ = 0;
 
@@ -246,8 +246,8 @@ public:
 
     void handleDatalinkHeartbeat() {
         
-        if (NOW() - lastHeartbeatSend_ > 0.5*SECONDS) {
-            lastHeartbeatSend_ = NOW();
+        if (NOW() > nextHeartbeatSend_) {
+            nextHeartbeatSend_ = NOW() + (drandPositive(1) + 0.5)*SECONDS; //Send a heartbeat every 0.5 to 1 seconds. Randomized to avoid collisions when synchronized.
 
             datalinkHeartbeatSub_.enable(false); //Disable so we dont receive our own heartbeat
             datalinkHeartbeat.publish(NOW());
