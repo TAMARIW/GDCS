@@ -11,8 +11,17 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+# If -l is given as a command line argument, run openocd locally
+if [ "$1" == "USB" ]; then
+    echo "Uploading the binary to the STM32 board locally"
+    openocd -f openocd.cfg
+    exit 0
+fi
+
+
+echo "Uploading the binary to the RPI board und then to the STM32 board"
 # Upload the binary to the RPI board. Auto input the password.
-scp ./build/main.hex openocd.cfg $1@$2:~/bootloader/
+scp ./build/firmware.hex openocd.cfg $1@$2:~/bootloader/
 
 # Connect to the RPI board and run openocd to upload the binary to the STM32 board via simply calling command "openocd"
 ssh $1@$2 "cd ~/bootloader && openocd"
