@@ -106,6 +106,10 @@ private:
 	/// @brief The time between each frame.
 	int64_t frameInterval_ns_ = END_OF_TIME;
 
+
+    CommBuffer<bool> datalinkConnected_;
+    Subscriber datalinkConnectedSub_;
+
     /// @brief Sets up the leds
     void setupAllLEDs();
 

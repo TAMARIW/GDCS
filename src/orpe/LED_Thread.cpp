@@ -209,6 +209,14 @@ void ORPE_LEDControl::ledCodingStateMachine(size_t ledIndex, bool beginCoding, b
 
 void ORPE_LEDControl::runtimeIDLogic() {
 
+    bool connected = false;
+    if (datalinkConnected_.getOnlyIfNewData(connected)) {
+
+        for (int i = 0; i < 12; i++) 
+            setLEDMode(connected ? LEDCodingMode_t::LEDCodingMode_Continuous : LEDCodingMode_t::LEDCodingMode_Off, i);
+
+    }
+
     /*OrpeTelemetry orpeTele;
     if (teleBuf_.getOnlyIfNewData(orpeTele) && orpeTele.valid) {
 

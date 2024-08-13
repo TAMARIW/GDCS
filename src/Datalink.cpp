@@ -267,7 +267,7 @@ public:
 
         }
 
-        if (NOW() - lastHeartbeatRecv_ > 5*SECONDS) { //If no heartbeat has been sent in 5 seconds then assume connection is lost
+        if (NOW() - lastHeartbeatRecv_ > 5*SECONDS) { //If no heartbeat has been received in 5 seconds then assume connection is lost
 
             if (datalinkConnected_) {
                 datalinkConnected_ = false;
