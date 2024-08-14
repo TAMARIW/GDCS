@@ -52,7 +52,7 @@ CommBuffer<float> com_dist0, com_dist1, com_dist2, com_dist3;
 // Topic to publish the UWB position estimations.
 Topic<Vector3D_F> uwbPositionTopic(-1, "UWB Position estimations"); 
 
-
+/*
 void DecaWaveDistanceMeasurement::init() {
     ledb.init(1, 1, 0);
     ledr.init(1, 1, 0);
@@ -94,7 +94,7 @@ int fcn(void *p, int m, int n, const double *x, double *fvec, int iflag) {
  * IMPORTANT: Adjust DEFAULT_STACKSIZE in platform-parameter.h (e.g. in rodos/src/bare-metal/stm32f4/platform-parameter/skith/platform-parameter.h)
  * to at least 2600 bytes (default is 2000 bytes) to avoid stack overflow. - DONE
  */
-
+/*
 Quaternion calculateRotation(Vector3D oldPos0, Vector3D oldPos1, Vector3D newPos0, Vector3D newPos1) {
     Vector3D initialDirection = (oldPos0 - oldPos1).normalize();
     Vector3D newDirection = (newPos0 - newPos1).normalize();
@@ -343,11 +343,11 @@ public:
 
             // Calculate four residuals.
             double dist[4] = {
-                dist_measurements[0] * dist_measurements[0] /* d0 := 0 to 0 */,
-                dist_measurements[2] * dist_measurements[2] /* d1 := 0 to 1 */,
-                dist_measurements[1] * dist_measurements[1] /* d2 := 1 to 0 */,
-                dist_measurements[3] * dist_measurements[3] /* d3 := 1 to 1  */,
-            };
+            //    dist_measurements[0] * dist_measurements[0],
+            //    dist_measurements[2] * dist_measurements[2],
+            //    dist_measurements[1] * dist_measurements[1],
+            //    dist_measurements[3] * dist_measurements[3],
+            //};
 
             /*double dist[4] = {
                 (uwbPosition0_0 - uwbPosition1_0).getLen() * (uwbPosition0_0 - uwbPosition1_0).getLen(),
@@ -355,7 +355,7 @@ public:
                 (uwbPosition0_1 - uwbPosition1_0).getLen() * (uwbPosition0_1 - uwbPosition1_0).getLen(),
                 (uwbPosition0_1 - uwbPosition1_1).getLen() * (uwbPosition0_1 - uwbPosition1_1).getLen()
             };*/
-
+            /*
             data.dists[0] = dist[0];
             data.dists[1] = dist[1];
             data.dists[2] = dist[2];
@@ -421,4 +421,4 @@ public:
         }
         
     }
-}EstimatedPositionCalculatorThread0;
+}EstimatedPositionCalculatorThread0;*/
