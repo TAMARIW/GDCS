@@ -14,7 +14,7 @@ fi
 # If -l is given as a command line argument, run openocd locally
 if [ "$1" == "USB" ]; then
     echo "Uploading the binary to the STM32 board locally"
-    openocd -f openocd.cfg
+    openocd -f openocdlocal.cfg
     exit 0
 fi
 
