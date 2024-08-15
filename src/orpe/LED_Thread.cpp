@@ -9,7 +9,7 @@ using namespace ORPE;
 
 
 ORPE_LEDControl::ORPE_LEDControl(int64_t frameInterval_ns) : 
-    StaticThread("LED Thread", 1000)
+    StaticThread("LED Thread", 500)
 {
 
 	frameInterval_ns_ = frameInterval_ns;

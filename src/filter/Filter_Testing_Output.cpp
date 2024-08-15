@@ -24,6 +24,7 @@ private:
 public:
 
     FilterOutputTesting(Topic<Quaternion_F>& attitudeTopic, Topic<Vector3D_F>& positionTopic) :
+        StaticThread<>("FilterOutputTesting"),
         attitudeSubr_(attitudeTopic, attitudeBuf_, "Attitude Subr for Filter output testing"),
         positionSubr_(positionTopic, positionBuf_, "Position Subr for Filter output testing")
     {}

@@ -96,6 +96,7 @@ private:
 public:
 
     ORPEManager() : 
+        StaticThread<>("ORPE Manager"),
         orpeStateSubscriber_(orpeState, orpeStateBuf_),
         orpePoseSubscriber_(orpeRelativePose, orpePoseBuf_)
     {}
