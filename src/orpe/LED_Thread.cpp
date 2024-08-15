@@ -9,7 +9,7 @@ using namespace ORPE;
 
 
 ORPE_LEDControl::ORPE_LEDControl(int64_t frameInterval_ns) : 
-    StaticThread("LED Thread", 500)
+    StaticThread<>("LED Thread", 500)
 {
 
 	frameInterval_ns_ = frameInterval_ns;
@@ -209,13 +209,13 @@ void ORPE_LEDControl::ledCodingStateMachine(size_t ledIndex, bool beginCoding, b
 
 void ORPE_LEDControl::runtimeIDLogic() {
 
-    bool connected = false;
+    /*bool connected = false;
     if (datalinkConnected_.getOnlyIfNewData(connected)) {
 
         for (int i = 0; i < 12; i++) 
             setLEDMode(connected ? LEDCodingMode_t::LEDCodingMode_Continuous : LEDCodingMode_t::LEDCodingMode_Off, i);
 
-    }
+    }*/
 
     /*OrpeTelemetry orpeTele;
     if (teleBuf_.getOnlyIfNewData(orpeTele) && orpeTele.valid) {

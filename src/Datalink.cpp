@@ -183,7 +183,7 @@ public:
 
             datalinkEnableWifiAP.publish(false);
             datalinkEnableWifiConnect.publish(true);
-            wifiConnectionWaitEnd_ = NOW() + drandPositive(5)*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
+            wifiConnectionWaitEnd_ = NOW() + 10*SECONDS; //Wait for 10 seconds before trying to connect by providing AP
             wifiControlState_ = WiFiControlState_CONNECT_WAIT;
             break;
 
@@ -201,7 +201,7 @@ public:
                 
                 datalinkEnableWifiAP.publish(true);
                 datalinkEnableWifiConnect.publish(false);
-                wifiConnectionWaitEnd_ = NOW() + drandPositive(5)*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
+                wifiConnectionWaitEnd_ = NOW() + (10 + drandPositive(10))*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
                 wifiControlState_ = WiFiControlState_ACCESSPOINT_WAIT;
 
             }
@@ -222,7 +222,7 @@ public:
                 
                 datalinkEnableWifiAP.publish(false);
                 datalinkEnableWifiConnect.publish(true);
-                wifiConnectionWaitEnd_ = NOW() + drandPositive(5)*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
+                wifiConnectionWaitEnd_ = NOW() + (10 + drandPositive(10))*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
                 wifiControlState_ = WiFiControlState_CONNECT_WAIT;
 
             }
