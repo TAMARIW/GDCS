@@ -21,6 +21,7 @@ Topic<bool> datalinkEnableWifiConnect(DATALINK_ENABLE_WIFI_CONNECT, "Enable or d
 
 //Topic to update if the datalink has connection to opposite satellite
 Topic<bool> datalinkConnected(-1, "Datalink connection");
+Topic<bool> oppositeDatalinkConnected(-1, "Opposite Datalink connection");
 
 //Topic to control the WIFI mode of operation. 0 = OFF, 1 = AP, 2 = CONNECT, 3 = Automatic (Default)
 Topic<int> datalinkWiFiMode(-1, "Datalink WIFI mode");
@@ -48,6 +49,7 @@ private:
     int64_t wifiConnectionWaitEnd_ = 0;
 
     bool datalinkConnected_ = false;
+    bool oppositeDatalinkConnected_ = false;
 
     CommBuffer<int64_t> datalinkHeartbeatBuf_;
     Subscriber datalinkHeartbeatSub_;
@@ -250,7 +252,7 @@ public:
             nextHeartbeatSend_ = NOW() + (drandPositive(1) + 0.5)*SECONDS; //Send a heartbeat every 0.5 to 1 seconds. Randomized to avoid collisions when synchronized.
 
             datalinkHeartbeatSub_.enable(false); //Disable so we dont receive our own heartbeat
-            datalinkHeartbeat.publish(NOW());
+            datalinkHeartbeat.publish(datalinkConnected_);
             datalinkHeartbeatSub_.enable(true);
             
         }
