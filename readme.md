@@ -1,11 +1,9 @@
 # Build tutorial:
 
 ```
-mkdir build
-cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=../lib/rodos/cmake/port/discovery.cmake ..
-make -j                
-arm-none-eabi-objcopy -O binary tmwstm32 uploadMeToSTM32.bin
+./build.sh <PORT> [CLEAN]
+./upload.sh [<USERNAME> <IP address of STM32>] or [USB]
 ```
 
-Now simply plug in the stm32 and copy uploadMeToSTM32.bin into the stm32 drive folder. then unplug and plug in the board to use new program.
+Build script must be given which platform (discovery, skith, posix etc.) and giving additionally CLEAN will start the build process from start (Use if problem occur).
+Upload script can use used to flash STM32 over WiFi is supported by the raspberry pi or simply use USB to upload using the connected programmer if openocd is installed. 
