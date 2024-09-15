@@ -13,4 +13,13 @@ extern HAL_UART datalinkUART;
 extern LinkinterfaceUART uartLinkinterface;
 extern Gateway datalinkGateway;
 
+
+//Topic to update if the datalink has connection to opposite satellite
+extern Topic<bool> datalinkConnected;
+//Topic to update if the opposite datalink has connection to this satellite
+extern Topic<bool> oppositeDatalinkConnected;
+
+//Topic to control the WIFI mode of operation. 0 = OFF, 1 = AP, 2 = CONNECT, 3 = Automatic (Default)
+extern Topic<int> datalinkWiFiMode;
+
 #endif
