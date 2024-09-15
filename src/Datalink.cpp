@@ -51,7 +51,7 @@ private:
     bool datalinkConnected_ = false;
     bool oppositeDatalinkConnected_ = false;
 
-    CommBuffer<int64_t> datalinkHeartbeatBuf_;
+    CommBuffer<bool> datalinkHeartbeatBuf_;
     Subscriber datalinkHeartbeatSub_;
 
     SubscriberObjRecv<int, DatalinkManagment> datalinkWiFiModeSub_;
@@ -257,7 +257,7 @@ public:
             
         }
 
-        int64_t heartbeatRecv = 0;
+        bool heartbeatRecv = 0;
         if (datalinkHeartbeatBuf_.getOnlyIfNewData(heartbeatRecv)) {
 
             lastHeartbeatRecv_ = NOW();
