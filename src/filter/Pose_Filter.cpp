@@ -85,7 +85,7 @@ void PoseFilter::processNewData() {
         float processDepthCov = processPositionCov_.z;
         float processLateralCov = sqrt(processPositionCov_.x * processPositionCov_.y);
 
-        float attitudeNoiseCov_ = processAttitudeCov_.getLen();
+        float attitudeNoiseCov_ = sqrt(processAttitudeCov_.x * processAttitudeCov_.y * processAttitudeCov_.z);
 
 
         //Next we calculate the weighted average.
