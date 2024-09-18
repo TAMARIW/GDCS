@@ -11,6 +11,17 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+# if a third and fourth argument is given, use them to upload this file and firmware to the rpi and then run this script there 
+if [ $# -eq 4 ]; then
+    echo "Uploading the binary to the RPI board und then to the STM32 board"
+    # Upload the binary to the RPI board. Auto input the password.
+    scp -o ProxyJump=$1@$2 ./build/firmware.hex openocd.cfg upload.sh $3@$4:~/bootloader/
+
+    # Connect to the RPI board and run openocd to upload the binary to the STM32 board via simply calling command "openocd"
+    ssh -J $1@$2 $3@$4 "cd ~/bootloader && openocd"
+    exit 0
+fi
+
 # If -l is given as a command line argument, run openocd locally
 if [ "$1" == "USB" ]; then
     echo "Uploading the binary to the STM32 board locally"
