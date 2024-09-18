@@ -6,9 +6,8 @@
 
 static Application module01("Decawave Distance Measurement Node", 2001);
 
-#define FILTER_SIZE 4 // Anzahl Werte die der Filter aufnehmen kann
-#define THRESHOLD 1 // Werte, die mehr als 2 Standardabweichungen vom Mittelwert entfernt sind, werden als Ausreißer betrachtet
-#define SENSOR_ERROR 0.1f
+#define FILTER_SIZE 10 // Anzahl der Werte im Filter
+#define THRESHOLD 2   // Schwellenwert für Ausreißer in Standardabweichungen
 
 template<typename T>
 class MovingAverageFilter {
@@ -19,12 +18,17 @@ private:
     int count;
 
     T calculateMean() const {
-        return sum / (count < FILTER_SIZE ? count : FILTER_SIZE);
+        // Berechnet den Mittelwert der Werte im Puffer
+        int validCount = count < FILTER_SIZE ? count : FILTER_SIZE;
+        return (validCount > 0) ? (sum / validCount) : 0;
     }
 
     T calculateStandardDeviation(T mean) const {
+        // Berechnet die Standardabweichung der Werte im Puffer
         T variance = 0;
         int validCount = count < FILTER_SIZE ? count : FILTER_SIZE;
+        if (validCount <= 1) return 0; // Vermeidet Division durch Null oder zu kleine Werte
+
         for (int i = 0; i < validCount; i++) {
             variance += (buffer[i] - mean) * (buffer[i] - mean);
         }
@@ -34,34 +38,46 @@ private:
 public:
     MovingAverageFilter() : sum(0), index(0), count(0) {
         for (int i = 0; i < FILTER_SIZE; ++i) {
-            buffer[i] = 0;
+            buffer[i] = 0; // Initialisiert den Puffer mit Nullwerten
         }
     }
 
     void add(T value) {
-        if (value < 0) // check whether value is negative then apply zero instead (no calibration necessary because sensors precision is well known!)
-            value = 0.0;
+        if (value < 0)
+            value = 0.0; // Negative Werte werden durch Null ersetzt
 
-        if (count < FILTER_SIZE) {
+        // Wenn der Filter leer ist, initialisiere ihn vollständig mit dem ersten Wert
+        if (count == 0) {
+            for (int i = 0; i < FILTER_SIZE; ++i) {
+                buffer[i] = value;
+            }
+            sum = value * FILTER_SIZE;
+            count = FILTER_SIZE;
+            index = 0;
+        } else if (count < FILTER_SIZE) {
+            // Normale Aufnahme in den Puffer bei nicht vollständiger Füllung
             buffer[count++] = value;
             sum += value;
         } else {
+            // Zyklische Aufnahme neuer Werte bei vollem Puffer
             sum -= buffer[index];
             buffer[index] = value;
             sum += value;
-            index = (index + 1) % FILTER_SIZE;
+            index = (index + 1) % FILTER_SIZE; // Kreisförmiges Pufferverhalten
         }
     }
 
     T getAverage() const {
-        if (count == 0) return 0;
+        if (count == 0) return 0; // Keine Werte im Puffer
 
-        int validCount = count < FILTER_SIZE ? count : FILTER_SIZE;
         T mean = calculateMean();
         T stddev = calculateStandardDeviation(mean);
-        
+
         T adjustedSum = 0;
         int adjustedCount = 0;
+
+        // Berechnet den angepassten Durchschnitt ohne Ausreißer
+        int validCount = count < FILTER_SIZE ? count : FILTER_SIZE;
         for (int i = 0; i < validCount; ++i) {
             if (abs(buffer[i] - mean) <= THRESHOLD * stddev) {
                 adjustedSum += buffer[i];
@@ -69,57 +85,12 @@ public:
             }
         }
 
-        if (adjustedCount == 0) return mean; // Wenn alle Werte Ausreißer sind, geben wir den bisherigen Mittelwert zurück
-
-        return adjustedSum / adjustedCount;
+        // Rückgabe des angepassten Durchschnitts oder des bisherigen Mittelwerts
+        return adjustedCount > 0 ? (adjustedSum / adjustedCount) : mean;
     }
 };
 
-#include <cmath>
 
-#define ALPHA 0.3 // Glättungsfaktor für den EMA (dieser Wert kann angepasst werden)
-
-template<typename T>
-class ExponentialMovingAverageFilter {
-private:
-    T buffer[FILTER_SIZE];
-    T ema;
-    bool initialized;
-    int index;
-    int count;
-
-public:
-    ExponentialMovingAverageFilter() : ema(0), initialized(false), index(0), count(0) {
-        for (int i = 0; i < FILTER_SIZE; ++i) {
-            buffer[i] = 0;
-        }
-    }
-
-    void add(T value) {
-        if (value < 0) // Check whether value is negative then apply zero instead (no calibration necessary because sensor's precision is well known!)
-            value = 0.0;
-
-        if (!initialized) {
-            ema = value;
-            initialized = true;
-        } else {
-            ema = ALPHA * value + (1 - ALPHA) * ema;
-        }
-
-        if (count < FILTER_SIZE) {
-            buffer[count++] = value;
-        } else {
-            buffer[index] = value;
-            index = (index + 1) % FILTER_SIZE;
-        }
-    }
-
-    T getAverage() const {
-        if (count == 0) return 0;
-
-        return ema;
-    }
-};
 
 class DecaWaveDistanceMeasurement : public StaticThread<>, public IOEventReceiver {
    public:
@@ -147,15 +118,14 @@ class DecaWaveDistanceMeasurement : public StaticThread<>, public IOEventReceive
     int64_t nextTime2Measure;  // timestamp when the next message should be send (RODOS time)
 
     uint8_t redNodeId;  // unique ID of each node
-    uint8_t sendNodeId;
+    uint8_t sendNodeId; // ID used to identify the correct recipient
     int32_t waitoffset;
 
     uint8_t spi_num; // number of used spi controller (either 0 or 1)
 
-    //MovingAverageFilter<float> mfilter;
-    ExponentialMovingAverageFilter<float> efilter;
+    MovingAverageFilter<float> mfilter; // stores all measured distances and calculates an average value
 
-    CommBuffer<float>& cbuf;
+    CommBuffer<float>& cbuf; // stores the mean values from the filter
 };
 
 #endif /* VaMEx_DWN_H_ */

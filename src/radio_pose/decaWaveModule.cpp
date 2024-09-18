@@ -8,10 +8,12 @@
 
 void init_decaWaveModule(uint8_t spi_num, dwt_config_t* conf) {
     /* Start with board specific hardware init. */
+    //PRINTF("Init peripherals\n");
     peripherals_init(spi_num);
     /* Reset and initialise DW1000.
      * For initialisation, DW1000 clocks must be temporarily set to crystal speed. After initialisation SPI rate can be increased for optimum
      * performance. */
+    //PRINTF("Reset DW1000\n");
     reset_DW1000(spi_num); /* Target specific drive of RSTn line into DW1000 low for a period. */
     spi_set_rate_low(spi_num);
     dwt_initialise(spi_num, DWT_LOADUCODE);

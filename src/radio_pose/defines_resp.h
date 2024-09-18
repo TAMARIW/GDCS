@@ -8,14 +8,14 @@
 static dwt_config_t config = {
     4,               /* Channel number */
     DWT_PRF_64M,     /* Pulse repetition frequency. */
-    DWT_PLEN_2048,   /* Preamble length. */
-    DWT_PAC64,       /* Preamble acquisition chunk size. Used in RX only. */
+    DWT_PLEN_64,   /* Preamble length. */
+    DWT_PAC8,       /* Preamble acquisition chunk size. Used in RX only. */
     17,              /* TX preamble code. Used in TX only. */
     17,              /* RX preamble code. Used in RX only. */
     1,               /* Use non-standard SFD (Boolean) */
-    DWT_BR_110K,     /* Data rate. */
+    DWT_BR_6M8,     /* Data rate. */
     DWT_PHRMODE_STD, /* PHY header mode. */
-    (2049 + 64 - 64) /* SFD timeout (preamble length + 1 + SFD length - PAC size). Used in RX only. */
+    (65 + 64 - 8) /* SFD timeout (preamble length + 1 + SFD length - PAC size). Used in RX only. */
 };
 
 /**

@@ -5,7 +5,7 @@
 #include "Datalink.hpp"
 
 
-//Class to setup and control the datalink stuff
+//Class to simply print that the program is still running
 class ImAlive : StaticThread<> {
 private:
 
@@ -31,4 +31,4 @@ public:
 
     }
 
-} imAlive;
+};// imAlive;

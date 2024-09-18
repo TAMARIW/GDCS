@@ -82,7 +82,7 @@ SubscriberReceiver<OrpeTelemetry> selfORPETmtRecv(orpeSelfTmtTopic, callbackFunc
 
 
 
-//Class to setup, communicate and control ORPE via datalink.
+//Class to setup, communicate and control ORPE via datalink. Run function is used for testing
 class ORPEManager : StaticThread<> {
 private:
 

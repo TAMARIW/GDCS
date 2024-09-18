@@ -80,7 +80,7 @@ public:
 };
 
 
-FilterOutputTesting filterOutputTesting (filterAttitudeTopic, filterPositionTopic);
+//FilterOutputTesting filterOutputTesting (filterAttitudeTopic, filterPositionTopic);
 
 
 }

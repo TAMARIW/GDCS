@@ -4,6 +4,7 @@
 #include "Datastruct.h"
 
 #include "Sub_Recv_Object.hpp"
+#include "../filter/Pose_Filter.hpp"
 
 #include "Datalink.hpp"
 
@@ -38,8 +39,6 @@ Gateway datalinkGateway(&uartLinkinterface);
 
 
 
-
-
 //Class to setup and control the datalink stuff
 class DatalinkManagment : StaticThread<> {
 private:
@@ -63,7 +62,7 @@ private:
         WiFiControlMode_CONNECT, //Enable wifi connection
         WiFiControlMode_AUTOMATIC, //Automatically control wifi to negotiate connection
     } wifiControlMode_ = WiFiControlMode_OFF;
-    Atomic<WiFiControlMode_t> wifiControlModeSet_ = WiFiControlMode_AUTOMATIC;
+    WiFiControlMode_t wifiControlModeSet_ = WiFiControlMode_AUTOMATIC;
 
 
     enum WiFiControlState_t {
@@ -139,7 +138,7 @@ public:
             if (wifiControlMode_ != wifiControlModeSet_) {
                 datalinkEnableWifiAP.publish(false);
                 datalinkEnableWifiConnect.publish(false);
-                wifiControlMode_ = wifiControlModeSet_.load();
+                wifiControlMode_ = wifiControlModeSet_;
             }
             break;
 
@@ -147,7 +146,7 @@ public:
             if (wifiControlMode_ != wifiControlModeSet_) {
                 datalinkEnableWifiAP.publish(true);
                 datalinkEnableWifiConnect.publish(false);
-                wifiControlMode_ = wifiControlModeSet_.load();
+                wifiControlMode_ = wifiControlModeSet_;
             }
             break;
 
@@ -155,7 +154,7 @@ public:
             if (wifiControlMode_ != wifiControlModeSet_) {
                 datalinkEnableWifiAP.publish(false);
                 datalinkEnableWifiConnect.publish(true);
-                wifiControlMode_ = wifiControlModeSet_.load();
+                wifiControlMode_ = wifiControlModeSet_;
             }
             break;
         
@@ -280,4 +279,4 @@ public:
 
     }
 
-} datalinkManagment;
+};// datalinkManagment;

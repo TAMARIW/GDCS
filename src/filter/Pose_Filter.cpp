@@ -17,7 +17,7 @@ Topic<Vector3D_F> filterPositionTopic(-1, "Pose Filter Output Position");
 
 
 /// @brief Global filter object for use by other systems
-PoseFilter globalEstimationFilter(ORPETMW::orpeTelemetry, uwbPositionTopic);
+//PoseFilter globalEstimationFilter(ORPETMW::orpeTelemetry, uwbPositionTopic);
 
 
 
