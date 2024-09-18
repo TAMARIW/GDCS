@@ -36,8 +36,8 @@ void ORPE_LEDControl::setupAllLEDs() {
     this->setupLED(11, LEDPIN_12, 12, 50);
 
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 0);
-    setLEDMode(LEDCodingMode_t::LEDCodingMode_Illuminate, 1);
-    setLEDMode(LEDCodingMode_t::LEDCodingMode_Illuminate, 2);
+    setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 1);
+    setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 2);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 3);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 4);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 5);
@@ -47,7 +47,7 @@ void ORPE_LEDControl::setupAllLEDs() {
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 8);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 9);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 10);
-    setLEDMode(LEDCodingMode_t::LEDCodingMode_Off, 11);
+    setLEDMode(LEDCodingMode_t::LEDCodingMode_Continuous, 11);
 
     /*setLEDMode(LEDCodingMode_t::LEDCodingMode_Off, 6);
     setLEDMode(LEDCodingMode_t::LEDCodingMode_Off, 7);
