@@ -17,14 +17,13 @@
 
 
 //Topics for controlling the datalink WIFI
-Topic<bool> datalinkEnableWifiAP(DATALINK_ENABLE_WIFI_AP, "Enable or disable the wifi access point");
 Topic<bool> datalinkEnableWifiConnect(DATALINK_ENABLE_WIFI_CONNECT, "Enable or disable the wifi connection");
 
 //Topic to update if the datalink has connection to opposite satellite
 Topic<bool> datalinkConnected(-1, "Datalink connection");
 Topic<bool> oppositeDatalinkConnected(-1, "Opposite Datalink connection");
 
-//Topic to control the WIFI mode of operation. 0 = OFF, 1 = AP, 2 = CONNECT, 3 = Automatic (Default)
+//Topic to control the WIFI mode of operation. 0 = OFF, 1 = Connect, 2 = Automatic (Default)
 Topic<int> datalinkWiFiMode(-1, "Datalink WIFI mode");
 
 //Topic to send the datalink heartbeat
@@ -53,37 +52,35 @@ private:
     CommBuffer<bool> datalinkHeartbeatBuf_;
     Subscriber datalinkHeartbeatSub_;
 
+    CommBuffer<Vector3D_F> sensorFusionPositionBuf_;
+    Subscriber sensorFusionPositionSub_;
+
     SubscriberObjRecv<int, DatalinkManagment> datalinkWiFiModeSub_;
 
 
     enum WiFiControlMode_t {
         WiFiControlMode_OFF, //Turn off wifi
-        WiFiControlMode_AP, //Enable wifi access point
         WiFiControlMode_CONNECT, //Enable wifi connection
         WiFiControlMode_AUTOMATIC, //Automatically control wifi to negotiate connection
     } wifiControlMode_ = WiFiControlMode_OFF;
-    WiFiControlMode_t wifiControlModeSet_ = WiFiControlMode_AUTOMATIC;
 
+    //If the wifi is currently enabled
+    bool wifiEnabled_ = false;
 
-    enum WiFiControlState_t {
-        WiFiControlState_OFF, //WiFi is off
-        WiFiControlState_CONNECTED, //WiFi is connected
-        WiFiControlState_CONNECT_WAIT, //Waiting for connection in mode connect
-        WiFiControlState_ACCESSPOINT_WAIT, //Waiting for connection in mode access point
-    } wifiControlState_ = WiFiControlState_CONNECT_WAIT;
 
 public:
 
     DatalinkManagment() : 
         StaticThread<>("DatalinkManagment", 2000), 
         datalinkHeartbeatSub_(datalinkHeartbeat, datalinkHeartbeatBuf_),
+        sensorFusionPositionSub_(filterPositionTopic, sensorFusionPositionBuf_),
         datalinkWiFiModeSub_(datalinkWiFiMode, &DatalinkManagment::wifiModeReceiver, this)
     {}
+
 
     void init() override {
 
         datalinkGateway.addTopicsToForward(&datalinkHeartbeat);
-        datalinkGateway.addTopicsToForward(&datalinkEnableWifiAP);
         datalinkGateway.addTopicsToForward(&datalinkEnableWifiConnect);
 
     }
@@ -108,23 +105,19 @@ public:
         switch (mode)
         {
         case 0:
-            wifiControlModeSet_ = WiFiControlMode_OFF;
+            wifiControlMode_ = WiFiControlMode_OFF;
             break;
 
         case 1:
-            wifiControlModeSet_ = WiFiControlMode_AP;
+            wifiControlMode_ = WiFiControlMode_CONNECT;
             break;
 
         case 2:
-            wifiControlModeSet_ = WiFiControlMode_CONNECT;
-            break;
-
-        case 3:
-            wifiControlModeSet_ = WiFiControlMode_AUTOMATIC;
+            wifiControlMode_ = WiFiControlMode_AUTOMATIC;
             break;
         
         default:
-            wifiControlModeSet_ = WiFiControlMode_AUTOMATIC;
+            wifiControlMode_ = WiFiControlMode_OFF;
             break;
         }
 
@@ -132,115 +125,47 @@ public:
 
     void handleWiFiControl() {
 
-        switch (wifiControlModeSet_)
+        switch (wifiControlMode_)
         {
         case WiFiControlMode_t::WiFiControlMode_OFF:
-            if (wifiControlMode_ != wifiControlModeSet_) {
-                datalinkEnableWifiAP.publish(false);
-                datalinkEnableWifiConnect.publish(false);
-                wifiControlMode_ = wifiControlModeSet_;
-            }
-            break;
 
-        case WiFiControlMode_t::WiFiControlMode_AP:
-            if (wifiControlMode_ != wifiControlModeSet_) {
-                datalinkEnableWifiAP.publish(true);
-                datalinkEnableWifiConnect.publish(false);
-                wifiControlMode_ = wifiControlModeSet_;
-            }
+            wifiEnabled_ = false;
+            datalinkEnableWifiConnect.publish(false);
+
             break;
 
         case WiFiControlMode_t::WiFiControlMode_CONNECT:
-            if (wifiControlMode_ != wifiControlModeSet_) {
-                datalinkEnableWifiAP.publish(false);
-                datalinkEnableWifiConnect.publish(true);
-                wifiControlMode_ = wifiControlModeSet_;
-            }
+
+            wifiEnabled_ = true;
+            datalinkEnableWifiConnect.publish(true);
+
             break;
         
         default: //Both do automatic as a fallback if the mode is not recognized
         case WiFiControlMode_t::WiFiControlMode_AUTOMATIC:
-            if (wifiControlMode_ != wifiControlModeSet_) {
-                wifiControlState_ = WiFiControlState_t::WiFiControlState_OFF; //Make sure we start from off
-            }
+
             wifiAutoStateMachine();
+
             break;
         
-        }
-
-        if (wifiControlModeSet_ != wifiControlMode_) {
-            wifiControlMode_ = wifiControlModeSet_;
         }
 
     }
 
     void wifiAutoStateMachine() {
 
-        switch (wifiControlState_)
-        {
-        case WiFiControlState_OFF:
+        Vector3D_F position;
+        if (sensorFusionPositionBuf_.getOnlyIfNewData(position)) {
 
-            PRINTF("Starting wifi connection process.\n Searching for AP...\n");
-
-            datalinkEnableWifiAP.publish(false);
-            datalinkEnableWifiConnect.publish(true);
-            wifiConnectionWaitEnd_ = NOW() + 10*SECONDS; //Wait for 10 seconds before trying to connect by providing AP
-            wifiControlState_ = WiFiControlState_CONNECT_WAIT;
-            break;
-
-        case WiFiControlState_CONNECT_WAIT:
-
-            if (datalinkConnected_) {
-
-                wifiControlState_ = WiFiControlState_CONNECTED;
-
-                PRINTF("Connected to AP!\n");
-
-            } else if (NOW() > wifiConnectionWaitEnd_) { //Timeout on connecting via connect mode. Switching to AP and waiting again.
-
-                PRINTF("No AP found. Starting access point...\n");
-                
-                datalinkEnableWifiAP.publish(true);
+            auto distance = position.getLen();
+            if (wifiEnabled_ && distance > DATALINK_WIFI_DISCONNECT_DISTANCE) {
+                wifiEnabled_ = false;
                 datalinkEnableWifiConnect.publish(false);
-                wifiConnectionWaitEnd_ = NOW() + (10 + drandPositive(10))*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
-                wifiControlState_ = WiFiControlState_ACCESSPOINT_WAIT;
-
-            }
-
-            break;
-
-        case WiFiControlState_ACCESSPOINT_WAIT:
-
-            if (datalinkConnected_) {
-
-                wifiControlState_ = WiFiControlState_CONNECTED;
-
-                PRINTF("Connected while providing AP!\n");
-
-            } else if (NOW() > wifiConnectionWaitEnd_) { //Timeout on connecting via access point mode. Switching to connect and waiting again.
-
-                PRINTF("No connection found. Starting connect mode...\n");
-                
-                datalinkEnableWifiAP.publish(false);
+            } else if (!wifiEnabled_ && distance < DATALINK_WIFI_CONNECT_DISTANCE) {
+                wifiEnabled_ = true;
                 datalinkEnableWifiConnect.publish(true);
-                wifiConnectionWaitEnd_ = NOW() + (10 + drandPositive(10))*SECONDS; //Wait for a random time between 0 and 5 seconds before trying to connect
-                wifiControlState_ = WiFiControlState_CONNECT_WAIT;
-
             }
 
-            break;
-
-        case WiFiControlState_CONNECTED:
-            //Do nothing. Just wait for the connection to be lost
-            if (!datalinkConnected_) {
-                wifiControlState_ = WiFiControlState_OFF;
-                PRINTF("Datalink connection lost! Restarting connection process...\n");
-            }
-            break;
-        
-        default:
-            wifiControlState_ = WiFiControlState_OFF;
-            break;
         }
 
     }
