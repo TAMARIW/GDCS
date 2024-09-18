@@ -2,12 +2,16 @@
 # This script is used to upload the binary to the STM32 board.
 # The IP address of the RPI board is to be given as a command line argument.
 
-PASSWORD=zero
-
+# Example usage:
+# ./upload.sh USB -> Upload the binary to the STM32 board using the connected ST-Link
+# ./upload.sh TMW 10.42.0.10 -> Upload the binary to the STM32 board using the RPI board over wifi
+# ./upload.sh TMW 10.42.0.10 TMW 192.168.10.2 -> Upload the binary to the STM32 board of the opposite RPI board through the first RPI board over wifi
 
 # Check if the IP address is given as a command line argument
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <USERNAME> <IP address of STM32>"
+    echo "Usage: $0 [<USERNAME> <IP address of STM32> (Proxy <USERNAME> <IP address of STM32> )] | [USB]"
+    echo "Use USB to upload using the connected ST-Link"
+    echo "Use Proxy to upload over the network (e.g. uploading from A to C over B (A->B->C))"
     exit 1
 fi
 

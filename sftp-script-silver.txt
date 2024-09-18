@@ -1,7 +1,0 @@
-# Connect to SFTP server using a password
-open sftp://pi:raspberry@192.168.137.150/ -hostkey="ssh-ed25519 255 0HCAO1ADsiZTrGifUtjA8J16rdLb1MSWttcAbnVo2Yk"
-cd ./bootloader
-put .\build\main.bin
-call openocd
-close
-exit
