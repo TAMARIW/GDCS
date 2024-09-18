@@ -448,8 +448,11 @@ public:
                 uwbPosition1_0 = x0;
                 uwbPosition1_1 = x0 + sat1Rotation * posInSat1;
 
-                if (cnt % 5 == 0)
-                    PRINTF("%i [%.1f, %.1f, %.1f][%.1f, %.1f, %.1f] %.1f\n", info, x0[0], x0[1], x0[2], uwbPosition1_1.x, uwbPosition1_1.y, uwbPosition1_1.z, vec_val); // print estimated position of sensor 1
+                // Publish estimated position.
+                Vector3D_F position = Vector3D_F(uwbPosition1_0.x, uwbPosition1_0.y, uwbPosition1_0.z);
+                uwbPositionTopic.publish(position);
+
+                PRINTF("%i [%.1f, %.1f, %.1f][%.1f, %.1f, %.1f] %.1f\n", info, x0[0], x0[1], x0[2], uwbPosition1_1.x, uwbPosition1_1.y, uwbPosition1_1.z, vec_val); // print estimated position of sensor 1
 
             } else {
                 PRINTF("No solution found. Info: %d\n", info);

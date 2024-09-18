@@ -26,17 +26,18 @@ extern Topic<Quaternion_F> filterAttitudeTopic;
 extern Topic<Vector3D_F> filterPositionTopic;
 
 
-
 class PoseFilter : StaticThread<> {
 private:
 
-    Vector3D_F processPositionCov_ = Vector3D_F(1, 1, 1);  //The covariance of the model. Usually the same in all axis'.
+
+
+    Vector3D_F processPositionCov_ = Vector3D_F(0.01, 0.01, 0.1);  //The covariance of the model. Usually the same in all axis'.
     Vector3D_F processAttitudeCov_ = Vector3D_F(1, 1, 1);   //The covariance of the model. Usually the same in all axis'.
+    
+    Vector3D_F orpePositionCovPerc_ = Vector3D_F(0.1, 0.1, 2);   //The covariance of orpes position estimation. Usually higher in the direction of the target satellite (simplified by saying its higher in the z axis) 
+    Vector3D_F orpeAttitudeCovPerc_ = Vector3D_F(1, 1, 1);    //The covariance of orpes attitude estimation.
 
-    Vector3D_F orpePositionCov_ = Vector3D_F(1, 1, 10);   //The covariance of orpes position estimation. Usually higher in the direction of the target satellite (simplified by saying its higher in the z axis) 
-    Vector3D_F orpeAttitudeCov_ = Vector3D_F(1, 1, 1);    //The covariance of orpes attitude estimation.
-
-    Vector3D_F uwbPositionCov_ = Vector3D_F(100, 100, 10);  //The covariance of uwb radio based position estimations. Usually higher than orpe position estimation.
+    Vector3D_F uwbPositionCov_ = Vector3D_F(1, 1, 0.1);  //The covariance of uwb radio based position estimations. Usually higher than orpe position estimation.
 
 
     SubscriberObjRecv<OrpeTelemetry, PoseFilter> orpePoseRecv_;
@@ -54,6 +55,9 @@ private:
     Quaternion_F attitude_;
     Vector3D_F position_;
 
+    bool firstPosition_ = true;
+    bool firstAttitude_ = true;
+
 
 public:
 
@@ -64,6 +68,13 @@ public:
 
     /// @brief Where the actual processing happens.
     void run() override;
+
+    void setPose(Vector3D_F position, Quaternion_F attitude) {
+        newDataSem_.enter();    
+        position_ = position;
+        attitude_ = attitude;
+        newDataSem_.leave();
+    }
 
 
 private:
@@ -81,6 +92,9 @@ private:
 
 
 };
+
+
+extern PoseFilter globalEstimationFilter;
 
 }
 

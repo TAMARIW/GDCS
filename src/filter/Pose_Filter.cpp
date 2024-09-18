@@ -5,8 +5,6 @@
 
 #include "Pose_Filter.hpp"
 
-
-
 namespace RODOS {
 
 
@@ -17,7 +15,7 @@ Topic<Vector3D_F> filterPositionTopic(-1, "Pose Filter Output Position");
 
 
 /// @brief Global filter object for use by other systems
-//PoseFilter globalEstimationFilter(ORPETMW::orpeTelemetry, uwbPositionTopic);
+PoseFilter globalEstimationFilter(ORPETMW::orpeTelemetry, uwbPositionTopic);
 
 
 
@@ -41,7 +39,7 @@ void PoseFilter::run() {
 
         processNewData();
 
-        suspendCallerUntil(END_OF_TIME);
+        suspendCallerUntil(NOW() + 10 * MILLISECONDS);
 
     }
 
@@ -67,9 +65,38 @@ void PoseFilter::processNewData() {
     if (uwbPosition.getLen() > 500 || uwbPosition.getLen() < 2)  //If the data is out of bounds, we ignore it.
         uwbNew = false;
     
+    if (orpeNew && firstAttitude_) {
+
+        Vector3D_F orpeRot(orpeTele.ax, orpeTele.ay, orpeTele.az); 
+        Vector3D_F rotAxis = orpeRot.normalize();
+        float rotAngle = orpeRot.getLen();
+        attitude_ = Quaternion_F(rotAngle, rotAxis);
+
+        firstAttitude_ = false;
+
+    }
+
+    if (orpeNew && firstPosition_) {
+
+        Vector3D_F orpePos(orpeTele.px/1000, orpeTele.py/1000, orpeTele.pz/1000);
+        position_ = orpePos;
+
+        firstPosition_ = false;
+
+    }
+
+    if (uwbNew && firstPosition_) {
+
+        position_ = uwbPosition;
+
+        firstPosition_ = false;
+
+    }
 
     //If we have new data, we can start the filter calculations.
     if (orpeNew) {
+
+        //PRINTF("ORPE data: %f, %f, %f, %f, %f, %f\n", orpeTele.px, orpeTele.py, orpeTele.pz, orpeTele.ax, orpeTele.ay, orpeTele.az);
 
         Vector3D_F orpeRot(orpeTele.ax, orpeTele.ay, orpeTele.az); 
         Vector3D_F orpePos(orpeTele.px/1000, orpeTele.py/1000, orpeTele.pz/1000);
@@ -77,6 +104,11 @@ void PoseFilter::processNewData() {
         //Determine the covariance of the sensors.
         //This is modelled as a value for the distance and tangent to the target satellite, as ORPE has good lateral accuracy but poor depth accuracy and UWB has good depth accuracy but poor lateral accuracy.
         //This is a simplification but will greatly improve the filter efficiency.
+
+        //For ORPE the covariance is modelled as percentage of the distance.
+        auto dist = orpePos.getLen();
+        Vector3D_F orpePositionCov_ = dist * orpePositionCovPerc_;   //The covariance of orpes position estimation calculated from the percentage of the distance.
+        Vector3D_F orpeAttitudeCov_ = Vector3D_F(1, 1, 1);    //The covariance of orpes attitude estimation. Remains constant.
         float orpeDepthCov = orpePositionCov_.z;
         float orpeLateralCov = sqrt(orpePositionCov_.x * orpePositionCov_.y);
 
@@ -95,16 +127,24 @@ void PoseFilter::processNewData() {
             (orpePos.z * 1/orpeDepthCov + position_.z * 1/processDepthCov) / (1/orpeDepthCov + 1/processDepthCov)
         );
 
+        //attitude_.print();
+        Vector3D_F rotAxis = orpeRot.normalize();
+        float rotAngle = orpeRot.getLen();
+        Quaternion_F orpeRotQuat = Quaternion_F(AngleAxis_F(rotAngle, rotAxis));
 
-        auto currentRot = attitude_.getVec() * attitude_.getAngle();
-        auto newRot = (currentRot*(1/processAttitudeCov_.getLen()) + orpeRot*(1/orpeAttCov)) / (1/attitudeNoiseCov_ + 1/orpeAttCov);
-        attitude_ = Quaternion_F(newRot.getLen(), newRot);
+        //Simply average the two quaternions.
+        auto newAttitude = (orpeRotQuat * 1/orpeAttCov + attitude_ * 1/attitudeNoiseCov_) / (1/orpeAttCov + 1/attitudeNoiseCov_);
+        newAttitude = newAttitude.normalize();
+
+        attitude_ = newAttitude;
 
     }
 
 
     //Next we do the same for the UWB sensor.
     if (uwbNew) {
+
+        //PRINTF("UWB data: %f, %f, %f\n", uwbPosition.x, uwbPosition.y, uwbPosition.z);
 
         float uwbDepthCov = uwbPositionCov_.z;
         float uwbLateralCov = sqrt(uwbPositionCov_.x * uwbPositionCov_.y);

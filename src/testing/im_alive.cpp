@@ -2,8 +2,6 @@
 
 #include "Datastruct.h"
 
-#include "Datalink.hpp"
-
 
 //Class to simply print that the program is still running
 class ImAlive : StaticThread<> {
