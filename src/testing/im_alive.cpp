@@ -1,7 +1,5 @@
 #include "rodos.h"
 
-#include "Datastruct.h"
-
 
 //Class to simply print that the program is still running
 class ImAlive : StaticThread<> {
