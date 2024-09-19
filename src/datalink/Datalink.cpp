@@ -129,15 +129,19 @@ public:
         {
         case WiFiControlMode_t::WiFiControlMode_OFF:
 
-            wifiEnabled_ = false;
-            datalinkEnableWifiConnect.publish(false);
+            if (wifiEnabled_) {
+                wifiEnabled_ = false;
+                datalinkEnableWifiConnect.publish(false);
+            }
 
             break;
 
         case WiFiControlMode_t::WiFiControlMode_CONNECT:
 
-            wifiEnabled_ = true;
-            datalinkEnableWifiConnect.publish(true);
+            if (!wifiEnabled_) {
+                wifiEnabled_ = true;
+                datalinkEnableWifiConnect.publish(true);
+            }
 
             break;
         
