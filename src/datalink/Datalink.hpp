@@ -10,7 +10,7 @@
 
 //Settings for the datalink
 #define DATALINK_WIFI_CONNECT_DISTANCE 0.5 //crossing under this distance will trigger wifi to connect (In Meters)
-#define DATALINK_WIFI_DISCONNECT_DISTANCE 1 //crossing over this distance will trigger wifi to disconnect (In Meters)
+#define DATALINK_WIFI_DISCONNECT_DISTANCE 0.6 //crossing over this distance will trigger wifi to disconnect (In Meters)
 
 
 //Gateway setup

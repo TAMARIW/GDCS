@@ -34,6 +34,12 @@ Topic<ORPEState_t> orpeState(ORPE_STATE, "ORPE State manager"); //This is where 
 Topic<HTransform_F> orpeRelativePose(ORPE_RELATIVEPOSE, "ORPE relative pose estimations manager"); //This is where pose estimations will be published once valid.
 Topic<OrpeTelemetry> orpeTelemetry(ORPE_TELEMETRY, "ORPE telemetry.");
 
+//ORPE Topics for the opposite satellite
+Topic<bool> enableOppositeORPE(ORPE_ENABLE+10, "Opposite ORPE Enable manager"); //Publish to this to enable for disable ORPE.
+Topic<ORPEState_t> oppositeORPEState(ORPE_STATE+10, "Opposite ORPE State manager"); //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
+Topic<HTransform_F> oppositeORPERelativePose(ORPE_RELATIVEPOSE+10, "Opposite ORPE relative pose estimations manager"); //This is where pose estimations will be published once valid.
+Topic<OrpeTelemetry> oppositeORPETelemetry(ORPE_TELEMETRY+10, "Opposite ORPE telemetry.");
+
 
 //ORPE buffers and subscribers
 CommBuffer<ORPEState_t> orpeSelfState;
@@ -50,14 +56,28 @@ void callbackFuncEnableORPE(bool& enable) {
     orpeSelfCmdTopic.publish(cmd);
 
 }
+void callbackFuncEnableOppositeORPE(bool& enable) {
+
+    ORPECommand cmd;
+    cmd.command = enable ? ORPECommandType_t::ORPECommandType_Start : ORPECommandType_t::ORPECommandType_Stop;
+    orpeTgtCmdTopic.publish(cmd);
+
+}
 SubscriberReceiver<bool> enableORPERecv(enableORPE, callbackFuncEnableORPE);
+SubscriberReceiver<bool> enableOppositeORPERecv(enableOppositeORPE, callbackFuncEnableOppositeORPE);
 
 void callbackFuncSelfORPEState(ORPEState_t& state) {
 
     orpeState.publish(state);
 
 }
+void callbackFuncOppositeORPEState(ORPEState_t& state) {
+
+    oppositeORPEState.publish(state);
+
+}
 SubscriberReceiver<ORPEState_t> selfORPEStateRecv(orpeSelfSttTopic, callbackFuncSelfORPEState);
+SubscriberReceiver<ORPEState_t> oppositeORPEStateRecv(orpeTgtSttTopic, callbackFuncOppositeORPEState);
 
 void callbackFuncSelfORPETelemetry(OrpeTelemetry& telemetry) {
 
@@ -78,6 +98,26 @@ void callbackFuncSelfORPETelemetry(OrpeTelemetry& telemetry) {
     }
 
 }
+void callbackFuncOppositeORPETelemetry(OrpeTelemetry& telemetry) {
+
+    oppositeORPETelemetry.publish(telemetry); //Forward for the rest of the system
+
+    if (telemetry.valid) {
+
+        //Tranform from rotation vector to angleaxis
+        Vector3D_F rotVec(telemetry.ax, telemetry.ay, telemetry.az); //sqrtf(telemetry.ax*telemetry.ax + telemetry.ay*telemetry.ay + telemetry.az*telemetry.az);
+
+        HTransform_F pose (
+            AngleAxis_F(rotVec.getLen(), rotVec),
+            Vector3D_F(telemetry.px/1000, telemetry.py/1000, telemetry.pz/1000)
+        );
+
+        oppositeORPERelativePose.publish(pose);
+        
+    }
+
+}
+SubscriberReceiver<OrpeTelemetry> oppositeORPETmtRecv(orpeTgtTmtTopic, callbackFuncOppositeORPETelemetry);
 SubscriberReceiver<OrpeTelemetry> selfORPETmtRecv(orpeSelfTmtTopic, callbackFuncSelfORPETelemetry);
 
 

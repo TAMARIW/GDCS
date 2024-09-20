@@ -41,15 +41,18 @@ private:
 
 
     SubscriberObjRecv<OrpeTelemetry, PoseFilter> orpePoseRecv_;
+    SubscriberObjRecv<OrpeTelemetry, PoseFilter> orpePoseRecvOpposite_;
     SubscriberObjRecv<Vector3D_F, PoseFilter> uwbPosRecv_;
 
 
     Semaphore newDataSem_;
 
     OrpeTelemetry orpeData_;
+    OrpeTelemetry orpeDataOpposite_;
     Vector3D_F uwbData_;
 
     bool orpeNewData_ = false;
+    bool orpeNewDataOpposite_ = false;
     bool uwbNewData_ = false;
 
     Quaternion_F attitude_;
@@ -61,7 +64,7 @@ private:
 
 public:
 
-    PoseFilter(Topic<OrpeTelemetry>& orpePoseTopic, Topic<Vector3D_F>& uwbPositionTopic);
+    PoseFilter(Topic<OrpeTelemetry>& orpePoseTopic, Topic<OrpeTelemetry>& orpeOppositePoseTopic, Topic<Vector3D_F>& uwbPositionTopic);
 
 
     void init() override;
@@ -79,12 +82,24 @@ public:
 
 private:
 
+    /// @brief Fuses the orpe telemetry data into the filter.
+    /// @param orpeEst 
+    void fuseOrpeData(OrpeTelemetry& orpeEst);
+
+    /// @brief Fuses the uwb data into the filter.
+    /// @param uwbEst
+    void fuseUwbData(Vector3D_F& uwbEst);
+
     /// @brief To be called when new data is available. Does all filter calculations.
     void processNewData();
 
     /// @brief Receives the pose estmiations from orpe from topic.
     /// @param orpeEst 
     void orpeEstRecv(OrpeTelemetry& orpeEst);
+
+    /// @brief Receives the pose estmiations from opposite orpe from topic.
+    /// @param orpeEst 
+    void orpeEstRecvOpposite(OrpeTelemetry& orpeEst);
     
     /// @brief Receives the position estimations from uwb from topic. 
     /// @param uwbEst 

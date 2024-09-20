@@ -37,6 +37,13 @@ extern Topic<ORPEState_t> orpeState; //This is where new information of ORPEs st
 extern Topic<HTransform_F> orpeRelativePose; //This is where pose estimations will be published once valid.
 extern Topic<OrpeTelemetry> orpeTelemetry; //This is where the raw direct telemetry packets are published from ORPE. They contain advanced info on ORPE.
 
+//Below is the same as above but for the opposite satellite.
+extern Topic<bool> enableOppositeORPE; //Publish to this to enable for disable ORPE.
+extern Topic<ORPEState_t> oppositeORPEState; //This is where new information of ORPEs state will be published. The state will be updated periodically and async for sudden changes.
+extern Topic<HTransform_F> oppositeORPERelativePose; //This is where pose estimations will be published once valid.
+extern Topic<OrpeTelemetry> oppositeORPETelemetry; //This is where the raw direct telemetry packets are published from ORPE. They contain advanced info on ORPE.
+
+
 }
 
 #endif
