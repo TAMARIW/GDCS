@@ -45,33 +45,14 @@ public:
 
         while (true) {
             
-            attNew |= attitudeBuf_.getOnlyIfNewData(attitude);
-            posNew |= positionBuf_.getOnlyIfNewData(position);
+            attNew = attitudeBuf_.getOnlyIfNewData(attitude);
+            posNew = positionBuf_.getOnlyIfNewData(position);
 
-            if (posNew && attNew) {
+            //Print the attitude and position and if they are new
+            if (attNew || posNew)
+                PRINTF("Att: new %d, %f %f %f %f \t Pos %d, %f, %f, %f \n", attNew, attitude.q0, attitude.q.x, attitude.q.y, attitude.q.z, posNew, position.x, position.y, position.z);
 
-                PRINTF("Both position and attitude are new.\n");
-                PRINTF("Attiude: ");
-                attitude.print();
-                PRINTF("Position: ");
-                position.print();
-                PRINTF("\n");
-
-            } else if (posNew) {
-
-                PRINTF("Position is new.\n");
-                PRINTF("Position: ");
-                position.print();
-                PRINTF("\n");
-
-            } else if (attNew) {
-
-                PRINTF("Attitude is new.\n");
-                PRINTF("Attitude: ");
-                attitude.print();
-                PRINTF("\n");
-
-            }
+            suspendCallerUntil(NOW() + 10 * MILLISECONDS);
 
         }
 
@@ -80,7 +61,7 @@ public:
 };
 
 
-//FilterOutputTesting filterOutputTesting (filterAttitudeTopic, filterPositionTopic);
+FilterOutputTesting filterOutputTesting (filterAttitudeTopic, filterPositionTopic);
 
 
 }

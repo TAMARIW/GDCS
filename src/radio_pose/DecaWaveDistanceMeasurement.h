@@ -92,9 +92,9 @@ public:
 
 
 
-class DecaWaveDistanceMeasurement : public StaticThread<>, public IOEventReceiver {
+class DecaWaveDistanceMeasurement : public StaticThread<3000>, public IOEventReceiver {
    public:
-    DecaWaveDistanceMeasurement(const char* name, uint8_t _spi_num, int32_t _redNodeId, int32_t _sendNodeId, int32_t _waitoffset, CommBuffer<float>& _cbuf) : StaticThread<>(name, 1000), spi_num(_spi_num), redNodeId(_redNodeId), sendNodeId(_sendNodeId), waitoffset(_waitoffset), cbuf(_cbuf) {}
+    DecaWaveDistanceMeasurement(const char* name, uint8_t _spi_num, int32_t _redNodeId, int32_t _sendNodeId, int32_t _waitoffset, CommBuffer<float>& _cbuf) : StaticThread<3000>(name, 2000), spi_num(_spi_num), redNodeId(_redNodeId), sendNodeId(_sendNodeId), waitoffset(_waitoffset), cbuf(_cbuf) {}
     void init();
     void run();
 

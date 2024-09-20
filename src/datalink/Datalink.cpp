@@ -44,7 +44,7 @@ private:
 
     int64_t nextHeartbeatSend_ = 0;
     int64_t lastHeartbeatRecv_ = 0;
-    int64_t wifiConnectionWaitEnd_ = 0;
+    int64_t lastSensorFusionOutput = 0;
 
     bool datalinkConnected_ = false;
     bool oppositeDatalinkConnected_ = false;
@@ -65,7 +65,7 @@ private:
     } wifiControlMode_ = WiFiControlMode_OFF;
 
     //If the wifi is currently enabled
-    bool wifiEnabled_ = false;
+    bool wifiEnabled_ = true;
 
 
 public:
@@ -161,6 +161,8 @@ public:
         Vector3D_F position;
         if (sensorFusionPositionBuf_.getOnlyIfNewData(position)) {
 
+            lastSensorFusionOutput = NOW();
+
             auto distance = position.getLen();
             if (wifiEnabled_ && distance > DATALINK_WIFI_DISCONNECT_DISTANCE) {
                 wifiEnabled_ = false;
@@ -171,6 +173,7 @@ public:
             }
 
         }
+
 
     }
 
@@ -195,13 +198,23 @@ public:
                 datalinkConnected.publish(true);
             }
 
+            if (!oppositeDatalinkConnected_ && heartbeatRecv) {
+                oppositeDatalinkConnected_ = true;
+                oppositeDatalinkConnected.publish(true);
+            } else if (oppositeDatalinkConnected_ && !heartbeatRecv) {
+                oppositeDatalinkConnected_ = false;
+                oppositeDatalinkConnected.publish(false);
+            }
+
         }
 
         if (NOW() - lastHeartbeatRecv_ > 5*SECONDS) { //If no heartbeat has been received in 5 seconds then assume connection is lost
 
             if (datalinkConnected_) {
                 datalinkConnected_ = false;
+                oppositeDatalinkConnected_ = false;
                 datalinkConnected.publish(false);
+                oppositeDatalinkConnected.publish(false);
             }
             
         }

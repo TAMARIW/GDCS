@@ -12,7 +12,7 @@
 
 
 // Set this macro to either 0 or 1 depending on the board number.
-#define BOARD_ID 0
+#define BOARD_ID 1
 
 #if BOARD_ID == 0
 #define SENSOR1_ID1 1
@@ -156,13 +156,14 @@ void DecaWaveDistanceMeasurement::run() {
 
         if (nextTime2Measure <= NOW()) {
             start_twr(sendNodeId);
-            nextTime2Measure = NOW() + 50 * MILLISECONDS + waitoffset * MILLISECONDS; // vorher: 250
+            nextTime2Measure = NOW() + 500 * MILLISECONDS + waitoffset * MILLISECONDS; // vorher: 250
         }
 
         // enable receiver
         uint16_t states_reg = dwt_read16bitoffsetreg(spi_num, SYS_STATE_ID, 2);
         if (!(states_reg & 0x04)) dwt_rxenable(spi_num, 0);  // check if receiver is not already enabled
 
+        //suspendCallerUntil(nextTime2Measure - 10*MILLISECONDS);
         // Wait for new measurement depending on board sensor.
         if (spi_num == 0) {
             UWBirq1.suspendUntilDataReady(nextTime2Measure);
@@ -172,20 +173,20 @@ void DecaWaveDistanceMeasurement::run() {
             UWBirq2.resetInterruptEventStatus();
         }
 
-        //PRINTF("Received data. Time: %f, node: %d\n", SECONDS_NOW(), redNodeId);
+        PRINTF("Received data. Time: %f, node: %d\n", SECONDS_NOW(), redNodeId);
 
-        //suspendCallerUntil(NOW() + 10 * MILLISECONDS);
-        yield();
+        //
+        //yield();
 
         receiveMessages();
 
 
     }
 }
-DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread0("Decawave Distance Measurement Node Thread - SPI0", 0, SENSOR1_ID1, DEST_SENSOR1_ID1, 0, com_dist_0_to_0);
-DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread11("Decawave Distance Measurement Node Thread 2 - SPI1", 1, SENSOR2_ID2, DEST_SENSOR2_ID2, 0, com_dist_1_to_1);
-DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread01("Decawave Distance Measurement Node Thread 2 - SPI0", 0, SENSOR1_ID2, DEST_SENSOR2_ID1, 10, com_dist_0_to_1);
-DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread1("Decawave Distance Measurement Node Thread - SPI1", 1, SENSOR2_ID1, DEST_SENSOR1_ID2, 10, com_dist_1_to_0);
+//DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread0("Decawave Distance Measurement Node Thread - SPI0", 0, SENSOR1_ID1, DEST_SENSOR1_ID1, 0, com_dist_0_to_0);
+//DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread11("Decawave Distance Measurement Node Thread 2 - SPI1", 1, SENSOR2_ID2, DEST_SENSOR2_ID2, 200, com_dist_1_to_1);
+//DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread01("Decawave Distance Measurement Node Thread 2 - SPI0", 0, SENSOR1_ID2, DEST_SENSOR2_ID1, 400, com_dist_0_to_1);
+//DecaWaveDistanceMeasurement DecaWaveDistanceMeasurement_Thread1("Decawave Distance Measurement Node Thread - SPI1", 1, SENSOR2_ID1, DEST_SENSOR1_ID2, 600, com_dist_1_to_0);
 
 
 void DecaWaveDistanceMeasurement::send_dist(float distance, uint8_t destId) {
@@ -452,7 +453,7 @@ public:
                 Vector3D_F position = Vector3D_F(uwbPosition1_0.x, uwbPosition1_0.y, uwbPosition1_0.z);
                 uwbPositionTopic.publish(position);
 
-                PRINTF("%i [%.1f, %.1f, %.1f][%.1f, %.1f, %.1f] %.1f\n", info, x0[0], x0[1], x0[2], uwbPosition1_1.x, uwbPosition1_1.y, uwbPosition1_1.z, vec_val); // print estimated position of sensor 1
+                //PRINTF("%i [%.1f, %.1f, %.1f][%.1f, %.1f, %.1f] %.1f\n", info, x0[0], x0[1], x0[2], uwbPosition1_1.x, uwbPosition1_1.y, uwbPosition1_1.z, vec_val); // print estimated position of sensor 1
 
             } else {
                 PRINTF("No solution found. Info: %d\n", info);
@@ -462,4 +463,4 @@ public:
         }
         
     }
-}EstimatedPositionCalculatorThread0;
+} EstimatedPositionCalculatorThread0;
