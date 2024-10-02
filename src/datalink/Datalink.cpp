@@ -62,7 +62,7 @@ private:
         WiFiControlMode_OFF, //Turn off wifi
         WiFiControlMode_CONNECT, //Enable wifi connection
         WiFiControlMode_AUTOMATIC, //Automatically control wifi to negotiate connection
-    } wifiControlMode_ = WiFiControlMode_OFF;
+    } wifiControlMode_ = WiFiControlMode_AUTOMATIC;
 
     //If the wifi is currently enabled
     bool wifiEnabled_ = true;
@@ -190,6 +190,8 @@ public:
 
         bool heartbeatRecv = 0;
         if (datalinkHeartbeatBuf_.getOnlyIfNewData(heartbeatRecv)) {
+
+            PRINTF("Heartbeat received. Value: %d\n", heartbeatRecv);
 
             lastHeartbeatRecv_ = NOW();
 
