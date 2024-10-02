@@ -35,7 +35,7 @@ private:
     Vector3D_F processAttitudeCov_ = Vector3D_F(1, 1, 1);   //The covariance of the model. Usually the same in all axis'.
     
     Vector3D_F orpePositionCovPerc_ = Vector3D_F(0.1, 0.1, 2);   //The covariance of orpes position estimation. Usually higher in the direction of the target satellite (simplified by saying its higher in the z axis) 
-    Vector3D_F orpeAttitudeCovPerc_ = Vector3D_F(1, 1, 1);    //The covariance of orpes attitude estimation.
+    Vector3D_F orpeAttitudeCovPerc_ = Vector3D_F(5, 5, 5);    //The covariance of orpes attitude estimation.
 
     Vector3D_F uwbPositionCov_ = Vector3D_F(1, 1, 0.1);  //The covariance of uwb radio based position estimations. Usually higher than orpe position estimation.
 

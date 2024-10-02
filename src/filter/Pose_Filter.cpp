@@ -86,9 +86,9 @@ void PoseFilter::processNewData() {
         orpeTeleOpposite.py = pos.y;
         orpeTeleOpposite.pz = pos.z;
 
-        orpeTeleOpposite.ax = rot.u.x * rot.phi;
-        orpeTeleOpposite.ay = rot.u.y * rot.phi;
-        orpeTeleOpposite.az = rot.u.z * rot.phi;
+        orpeTeleOpposite.ax = -rot.u.x * rot.phi;
+        orpeTeleOpposite.ay = -rot.u.y * rot.phi;
+        orpeTeleOpposite.az = -rot.u.z * rot.phi;
 
     }
 
@@ -164,6 +164,14 @@ void PoseFilter::processNewData() {
 
         fuseUwbData(uwbPosition);
 
+    }
+
+    //Do a quick check to see if the data is valid. If any position is NaN, we set it to zero. Same for the attitude.
+    if (isnan(position_.x) || isnan(position_.y) || isnan(position_.z)) {
+        position_ = Vector3D_F(0, 0, 0);
+    }
+    if (isnan(attitude_.q0) || isnan(attitude_.q.x) || isnan(attitude_.q.y) || isnan(attitude_.q.z)) {
+        attitude_ = Quaternion_F(1, 0, 0, 0);
     }
 
 
